@@ -20,11 +20,95 @@
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #e1bee7 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .container {
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(233, 30, 99, 0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            color: #e91e63;
+            margin-bottom: 20px;
+        }
+
+        .login-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+        }
+
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 3px solid #e91e63;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ad1457;
+            font-weight: bold;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #f8bbd9;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #e91e63;
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.3);
+        }
+
+        .login-btn {
+            background: linear-gradient(45deg, #e91e63, #f06292);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 30, 99, 0.4);
+        }
+
+        .login-error {
+            color: #f44336;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .app-container {
+            display: none;
+            width: 100%;
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 20px auto;
             padding: 20px;
         }
 
@@ -459,295 +543,327 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .login-container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="connection-status" id="connectionStatus">
-        <i class="fas fa-circle"></i> Desconectado
+    <!-- Pantalla de Login -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-logo">
+            <img src="logo.jpg" alt="Luna's Make Up Logo">
+        </div>
+        <h2>Iniciar Sesión</h2>
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" required>
+            </div>
+            <div class="login-error" id="loginError">
+                <i class="fas fa-exclamation-circle"></i> Usuario o contraseña incorrectos
+            </div>
+            <button type="submit" class="login-btn">Ingresar</button>
+        </form>
     </div>
 
-    <div class="container">
-        <div class="header">
-            <div class="logo-container">
-                <img src="logo.jpg" alt="Luna's Make Up Logo" id="logoImg">
-            </div>
-            <h1>Luna's Make Up</h1>
-            <p>¡Bienvenida!</p>
+    <!-- Aplicación principal (oculta inicialmente) -->
+    <div class="app-container" id="appContainer">
+        <div class="connection-status" id="connectionStatus">
+            <i class="fas fa-circle"></i> Desconectado
         </div>
 
-        <!-- Configuración de Supabase (oculta) -->
-        <div class="config-section" id="configSection">
-            <h3><i class="fas fa-cog"></i> Configuración de Base de Datos</h3>
-            <div class="config-form">
-                <input type="text" id="supabaseUrl" placeholder="URL de Supabase">
-                <input type="password" id="supabaseKey" placeholder="Clave anónima de Supabase">
-                <button class="btn" onclick="connectSupabase()">Conectar</button>
+        <div class="container">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="logo.jpg" alt="Luna's Make Up Logo" id="logoImg">
+                </div>
+                <h1>¡Bievenida!</h1>
+                <p>Al sisteema de gestio de Luna´s Make Up</p>
             </div>
-        </div>
 
-        <!-- Navegación -->
-        <div class="nav-tabs">
-            <div class="nav-tab active" onclick="showTab('dashboard')">
-                <i class="fas fa-chart-pie"></i> Dashboard
+            <!-- Configuración de Supabase (oculta) -->
+            <div class="config-section" id="configSection">
+                <h3><i class="fas fa-cog"></i> Configuración de Base de Datos</h3>
+                <div class="config-form">
+                    <input type="text" id="supabaseUrl" placeholder="URL de Supabase">
+                    <input type="password" id="supabaseKey" placeholder="Clave anónima de Supabase">
+                    <button class="btn" onclick="connectSupabase()">Conectar</button>
+                </div>
             </div>
-            <div class="nav-tab" onclick="showTab('productos')">
-                <i class="fas fa-box"></i> Productos
-            </div>
-            <div class="nav-tab" onclick="showTab('ventas')">
-                <i class="fas fa-shopping-cart"></i> Ventas
-            </div>
-            <div class="nav-tab" onclick="showTab('costos')">
-                <i class="fas fa-receipt"></i> Costos
-            </div>
-            <div class="nav-tab" onclick="showTab('clientes')">
-                <i class="fas fa-users"></i> Clientes
-            </div>
-        </div>
 
-        <!-- Dashboard -->
-        <div id="dashboard" class="tab-content active">
-            <div class="card">
-                <h3><i class="fas fa-filter"></i> Filtros de Tiempo</h3>
-                <div class="time-filter">
-                    <button class="time-filter-btn active" onclick="changeTimeFilter('hoy')">Hoy</button>
-                    <button class="time-filter-btn" onclick="changeTimeFilter('semana')">Esta Semana</button>
-                    <button class="time-filter-btn" onclick="changeTimeFilter('mes')">Este Mes</button>
-                    <button class="time-filter-btn" onclick="changeTimeFilter('total')">Total</button>
+            <!-- Navegación -->
+            <div class="nav-tabs">
+                <div class="nav-tab active" onclick="showTab('dashboard')">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </div>
+                <div class="nav-tab" onclick="showTab('productos')">
+                    <i class="fas fa-box"></i> Productos
+                </div>
+                <div class="nav-tab" onclick="showTab('ventas')">
+                    <i class="fas fa-shopping-cart"></i> Ventas
+                </div>
+                <div class="nav-tab" onclick="showTab('costos')">
+                    <i class="fas fa-receipt"></i> Costos
+                </div>
+                <div class="nav-tab" onclick="showTab('clientes')">
+                    <i class="fas fa-users"></i> Clientes
+                </div>
+                <div class="nav-tab" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
                 </div>
             </div>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-box"></i>
-                    <h4>Total Productos</h4>
-                    <div class="value" id="totalProductos">0</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-dollar-sign"></i>
-                    <h4>Ventas</h4>
-                    <div class="value" id="ventasPeriodo">$0</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-chart-line"></i>
-                    <h4>Ganancia</h4>
-                    <div class="value" id="gananciaPeriodo">$0</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <h4>Total Clientes</h4>
-                    <div class="value" id="totalClientes">0</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-money-bill-wave"></i>
-                    <h4>Deudas Pendientes</h4>
-                    <div class="value" id="totalDeudas">$0</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-receipt"></i>
-                    <h4>Costos</h4>
-                    <div class="value" id="costosPeriodo">$0</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-chart-bar"></i> Resumen de Ventas</h3>
-                <div class="chart-container">
-                    <canvas id="ventasChart"></canvas>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-chart-pie"></i> Distribución de Costos</h3>
-                <div class="chart-container">
-                    <canvas id="costosChart"></canvas>
-                </div>
-            </div>
-        </div>
 
-        <!-- Productos -->
-        <div id="productos" class="tab-content">
-            <div class="card">
-                <h3><i class="fas fa-plus"></i> Agregar Producto</h3>
-                <form id="productoForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nombre del Producto</label>
-                            <input type="text" id="productoNombre" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Costo</label>
-                            <input type="number" step="0.01" id="productoCosto" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Precio de Venta</label>
-                            <input type="number" step="0.01" id="productoPrecio" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Stock Inicial</label>
-                            <input type="number" id="productoStock" value="0">
-                        </div>
+            <!-- Dashboard -->
+            <div id="dashboard" class="tab-content active">
+                <div class="card">
+                    <h3><i class="fas fa-filter"></i> Filtros de Tiempo</h3>
+                    <div class="time-filter">
+                        <button class="time-filter-btn active" onclick="changeTimeFilter('hoy')">Hoy</button>
+                        <button class="time-filter-btn" onclick="changeTimeFilter('semana')">Esta Semana</button>
+                        <button class="time-filter-btn" onclick="changeTimeFilter('mes')">Este Mes</button>
+                        <button class="time-filter-btn" onclick="changeTimeFilter('total')">Total</button>
                     </div>
-                    <button type="submit" class="btn">Agregar Producto</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-list"></i> Lista de Productos</h3>
-                <table class="table" id="productosTable">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Costo</th>
-                            <th>Precio</th>
-                            <th>Stock</th>
-                            <th>Vendidos</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Ventas -->
-        <div id="ventas" class="tab-content">
-            <div class="card">
-                <h3><i class="fas fa-plus"></i> Registrar Venta</h3>
-                <form id="ventaForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Producto</label>
-                            <select id="ventaProducto" required>
-                                <option value="">Seleccionar producto</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Cantidad</label>
-                            <input type="number" id="ventaCantidad" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Cliente (opcional)</label>
-                            <select id="ventaCliente">
-                                <option value="">Seleccionar cliente</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha</label>
-                            <input type="date" id="ventaFecha" required>
-                        </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-box"></i>
+                        <h4>Total Productos</h4>
+                        <div class="value" id="totalProductos">0</div>
                     </div>
-                    <button type="submit" class="btn">Registrar Venta</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-list"></i> Historial de Ventas</h3>
-                <table class="table" id="ventasTable">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Precio Unit.</th>
-                            <th>Total</th>
-                            <th>Ganancia</th>
-                            <th>Cliente</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Costos -->
-        <div id="costos" class="tab-content">
-            <div class="card">
-                <h3><i class="fas fa-plus"></i> Registrar Costo</h3>
-                <form id="costoForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Concepto</label>
-                            <input type="text" id="costoConcepto" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Monto</label>
-                            <input type="number" step="0.01" id="costoMonto" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Categoría</label>
-                            <select id="costoCategoria" required>
-                                <option value="">Seleccionar categoría</option>
-                                <option value="Materiales">Materiales</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Envío">Envío</option>
-                                <option value="Otros">Otros</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha</label>
-                            <input type="date" id="costoFecha" required>
-                        </div>
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <h4>Ventas</h4>
+                        <div class="value" id="ventasPeriodo">$0</div>
                     </div>
-                    <button type="submit" class="btn">Registrar Costo</button>
-                </form>
-            </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-list"></i> Lista de Costos</h3>
-                <table class="table" id="costosTable">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Concepto</th>
-                            <th>Monto</th>
-                            <th>Categoría</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Clientes -->
-        <div id="clientes" class="tab-content">
-            <div class="card">
-                <h3><i class="fas fa-plus"></i> Agregar Cliente</h3>
-                <form id="clienteForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Nombre</label>
-                            <input type="text" id="clienteNombre" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Deuda Inicial</label>
-                            <input type="number" step="0.01" id="clienteDeuda" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Contacto</label>
-                            <input type="text" id="clienteContacto">
-                        </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Ganancia</h4>
+                        <div class="value" id="gananciaPeriodo">$0</div>
                     </div>
-                    <button type="submit" class="btn">Agregar Cliente</button>
-                </form>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h4>Total Clientes</h4>
+                        <div class="value" id="totalClientes">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h4>Deudas Pendientes</h4>
+                        <div class="value" id="totalDeudas">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-receipt"></i>
+                        <h4>Costos</h4>
+                        <div class="value" id="costosPeriodo">$0</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-chart-bar"></i> Resumen de Ventas</h3>
+                    <div class="chart-container">
+                        <canvas id="ventasChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-chart-pie"></i> Distribución de Costos</h3>
+                    <div class="chart-container">
+                        <canvas id="costosChart"></canvas>
+                    </div>
+                </div>
             </div>
-            
-            <div class="card">
-                <h3><i class="fas fa-list"></i> Lista de Clientes</h3>
-                <table class="table" id="clientesTable">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Deuda</th>
-                            <th>Contacto</th>
-                            <th>Fecha Registro</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+
+            <!-- Productos -->
+            <div id="productos" class="tab-content">
+                <div class="card">
+                    <h3><i class="fas fa-plus"></i> Agregar Producto</h3>
+                    <form id="productoForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre del Producto</label>
+                                <input type="text" id="productoNombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Costo</label>
+                                <input type="number" step="0.01" id="productoCosto" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Precio de Venta</label>
+                                <input type="number" step="0.01" id="productoPrecio" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Stock Inicial</label>
+                                <input type="number" id="productoStock" value="0">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Agregar Producto</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-list"></i> Lista de Productos</h3>
+                    <table class="table" id="productosTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Costo</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Vendidos</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ventas -->
+            <div id="ventas" class="tab-content">
+                <div class="card">
+                    <h3><i class="fas fa-plus"></i> Registrar Venta</h3>
+                    <form id="ventaForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Producto</label>
+                                <select id="ventaProducto" required>
+                                    <option value="">Seleccionar producto</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Cantidad</label>
+                                <input type="number" id="ventaCantidad" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Cliente (opcional)</label>
+                                <select id="ventaCliente">
+                                    <option value="">Seleccionar cliente</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha</label>
+                                <input type="date" id="ventaFecha" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Registrar Venta</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-list"></i> Historial de Ventas</h3>
+                    <table class="table" id="ventasTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unit.</th>
+                                <th>Total</th>
+                                <th>Ganancia</th>
+                                <th>Cliente</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Costos -->
+            <div id="costos" class="tab-content">
+                <div class="card">
+                    <h3><i class="fas fa-plus"></i> Registrar Costo</h3>
+                    <form id="costoForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Concepto</label>
+                                <input type="text" id="costoConcepto" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Monto</label>
+                                <input type="number" step="0.01" id="costoMonto" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Categoría</label>
+                                <select id="costoCategoria" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="Materiales">Materiales</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Envío">Envío</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha</label>
+                                <input type="date" id="costoFecha" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Registrar Costo</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-list"></i> Lista de Costos</h3>
+                    <table class="table" id="costosTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Monto</th>
+                                <th>Categoría</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Clientes -->
+            <div id="clientes" class="tab-content">
+                <div class="card">
+                    <h3><i class="fas fa-plus"></i> Agregar Cliente</h3>
+                    <form id="clienteForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" id="clienteNombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Deuda Inicial</label>
+                                <input type="number" step="0.01" id="clienteDeuda" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Contacto</label>
+                                <input type="text" id="clienteContacto">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Agregar Cliente</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-list"></i> Lista de Clientes</h3>
+                    <table class="table" id="clientesTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Deuda</th>
+                                <th>Contacto</th>
+                                <th>Fecha Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -797,15 +913,42 @@
         let currentEditTable = null;
         let ventasChart = null;
         let costosChart = null;
+        const CORRECT_USERNAME = 'Lunita';
+        const CORRECT_PASSWORD = 'Lunita123';
 
-        // 2. INICIALIZACIÓN AL CARGAR LA PÁGINA
-        document.addEventListener('DOMContentLoaded', async function() {
+        // 2. MANEJO DEL LOGIN
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorElement = document.getElementById('loginError');
+            
+            if (username === CORRECT_USERNAME && password === CORRECT_PASSWORD) {
+                // Login exitoso
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                initializeApp();
+            } else {
+                // Login fallido
+                errorElement.style.display = 'block';
+            }
+        });
+
+        function logout() {
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function initializeApp() {
             try {
                 // Inicializar Supabase
                 supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
                 
                 // Probar conexión con una consulta simple
-                const { data, error } = await supabase
+                const { data, error } = supabase
                     .from('productos')
                     .select('*')
                     .limit(1);
@@ -822,9 +965,6 @@
                 document.getElementById('costoFecha').value = today;
                 document.getElementById('configSection').style.display = 'none';
                 
-                // Cargar logo
-                document.getElementById('logoImg').src = 'logo.jpg';
-                
                 loadData();
                 
                 // Configurar eventos de los modales
@@ -837,7 +977,7 @@
                 isConnected = false;
                 updateConnectionStatus();
             }
-        });
+        }
 
         // 3. FUNCIÓN DE ACTUALIZACIÓN DE ESTADO DE CONEXIÓN
         function updateConnectionStatus() {
