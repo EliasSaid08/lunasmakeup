@@ -357,6 +357,10 @@
             color: #e91e63;
         }
 
+        .stat-card .value.negative {
+            color: #f44336;
+        }
+
         .alert {
             padding: 15px;
             border-radius: 8px;
@@ -633,35 +637,47 @@
                 </div>
                 
                 <div class="stats-grid">
+                    <!-- Primera fila: Ventas y Costos -->
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <h4>Ventas Brutas</h4>
+                        <div class="value" id="ventasBrutasPeriodo">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-receipt"></i>
+                        <h4>Costos Totales</h4>
+                        <div class="value" id="costosPeriodo">$0</div>
+                    </div>
+                    
+                    <!-- Segunda fila: Ganancias -->
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Ganancia Bruta</h4>
+                        <div class="value" id="gananciaBrutaPeriodo">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <h4>Ganancia Neta</h4>
+                        <div class="value" id="gananciaNetaPeriodo">$0</div>
+                    </div>
+                    
+                    <!-- Tercera fila: Inventario y Clientes -->
                     <div class="stat-card">
                         <i class="fas fa-box"></i>
                         <h4>Total Productos</h4>
                         <div class="value" id="totalProductos">0</div>
                     </div>
                     <div class="stat-card">
-                        <i class="fas fa-dollar-sign"></i>
-                        <h4>Ventas</h4>
-                        <div class="value" id="ventasPeriodo">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-chart-line"></i>
-                        <h4>Ganancia</h4>
-                        <div class="value" id="gananciaPeriodo">$0</div>
-                    </div>
-                    <div class="stat-card">
                         <i class="fas fa-users"></i>
                         <h4>Total Clientes</h4>
                         <div class="value" id="totalClientes">0</div>
                     </div>
+                    
+                    <!-- Cuarta fila: Deudas -->
                     <div class="stat-card">
-                        <i class="fas fa-money-bill-wave"></i>
+                        <i class="fas fa-money-bill-alt"></i>
                         <h4>Deudas Pendientes</h4>
                         <div class="value" id="totalDeudas">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <i class="fas fa-receipt"></i>
-                        <h4>Costos</h4>
-                        <div class="value" id="costosPeriodo">$0</div>
                     </div>
                 </div>
                 
@@ -1118,10 +1134,10 @@
                     .lte('fecha', endDate);
                 
                 const totalVentas = ventasPeriodo?.reduce((sum, venta) => sum + parseFloat(venta.total), 0) || 0;
-                const totalGanancias = ventasPeriodo?.reduce((sum, venta) => sum + parseFloat(venta.ganancia), 0) || 0;
+                const totalGananciasBrutas = ventasPeriodo?.reduce((sum, venta) => sum + parseFloat(venta.ganancia), 0) || 0;
                 
-                document.getElementById('ventasPeriodo').textContent = `$${totalVentas.toFixed(2)}`;
-                document.getElementById('gananciaPeriodo').textContent = `$${totalGanancias.toFixed(2)}`;
+                document.getElementById('ventasBrutasPeriodo').textContent = `$${totalVentas.toFixed(2)}`;
+                document.getElementById('gananciaBrutaPeriodo').textContent = `$${totalGananciasBrutas.toFixed(2)}`;
 
                 // Costos del periodo
                 const { data: costosPeriodo } = await supabase
@@ -1132,6 +1148,18 @@
                 
                 const totalCostos = costosPeriodo?.reduce((sum, costo) => sum + parseFloat(costo.monto), 0) || 0;
                 document.getElementById('costosPeriodo').textContent = `$${totalCostos.toFixed(2)}`;
+
+                // Calcular ganancia neta
+                const gananciaNeta = totalGananciasBrutas - totalCostos;
+                const gananciaNetaElement = document.getElementById('gananciaNetaPeriodo');
+                gananciaNetaElement.textContent = `$${Math.abs(gananciaNeta).toFixed(2)}`;
+                
+                // Cambiar color si es pérdida
+                if (gananciaNeta < 0) {
+                    gananciaNetaElement.classList.add('negative');
+                } else {
+                    gananciaNetaElement.classList.remove('negative');
+                }
 
                 // Total clientes y deudas
                 const { data: clientes } = await supabase.from('clientes').select('*');
