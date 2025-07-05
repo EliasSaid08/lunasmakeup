@@ -588,7 +588,7 @@
                 <div class="logo-container">
                     <img src="logo.jpg" alt="Luna's Make Up Logo" id="logoImg">
                 </div>
-                <h1>¡Bievenida!</h1>
+                <h1>¡Bienvenida amor de mi vida!</h1>
                 <p>Al sisteema de gestio de Luna´s Make Up</p>
             </div>
 
@@ -668,9 +668,9 @@
                         <div class="value" id="totalProductos">0</div>
                     </div>
                     <div class="stat-card">
-                        <i class="fas fa-users"></i>
-                        <h4>Total Clientes</h4>
-                        <div class="value" id="totalClientes">0</div>
+                        <i class="fas fa-shopping-basket"></i>
+                        <h4>Valor Total De Compra</h4>
+                        <div class="value" id="valorTotalDeCompra">$0</div>
                     </div>
                     
                     <!-- Cuarta fila: Deudas -->
@@ -678,6 +678,11 @@
                         <i class="fas fa-money-bill-alt"></i>
                         <h4>Deudas Pendientes</h4>
                         <div class="value" id="totalDeudas">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h4>Total Clientes</h4>
+                        <div class="value" id="totalClientes">0</div>
                     </div>
                 </div>
                 
@@ -951,6 +956,18 @@
             }
         });
 
+
+        function safeSetContent(id, value) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value;
+            } else {
+                console.warn(`Elemento con ID ${id} no encontrado`);
+            }
+        }
+
+
+
         function logout() {
             document.getElementById('appContainer').style.display = 'none';
             document.getElementById('loginContainer').style.display = 'flex';
@@ -1093,10 +1110,10 @@
             }
         }
 
-        // 8. ACTUALIZAR DASHBOARD
+         // 8. ACTUALIZAR DASHBOARD
         async function updateDashboard() {
             if (!supabase) return;
-
+        
             try {
                 // Obtener fechas según el filtro
                 let startDate, endDate;
@@ -1121,25 +1138,48 @@
                         endDate = '2100-12-31';
                         break;
                 }
-
-                // Total productos
+        
+                // 1. Obtener productos y valor del inventario
                 const { data: productos } = await supabase.from('productos').select('*');
-                document.getElementById('totalProductos').textContent = productos?.length || 0;
-
-                // Ventas del periodo
+                const totalProductos = productos?.length || 0;
+                const valorInventario = productos?.reduce((sum, producto) => sum + (producto.costo * producto.stock), 0) || 0;
+                
+                document.getElementById('totalProductos').textContent = totalProductos;
+                document.getElementById('valorTotalDeCompra').textContent = `$${valorInventario.toFixed(2)}`;
+        
+                // 2. Obtener ventas del período y calcular:
+                //    - Ventas brutas (total de ventas)
+                //    - Costo total de productos vendidos
                 const { data: ventasPeriodo } = await supabase
                     .from('ventas')
-                    .select('total, ganancia')
+                    .select('producto_id, cantidad, total, ganancia')
                     .gte('fecha', startDate)
                     .lte('fecha', endDate);
-                
+        
+                // Calcular Ventas Brutas (suma de todos los 'total' de ventas)
                 const totalVentas = ventasPeriodo?.reduce((sum, venta) => sum + parseFloat(venta.total), 0) || 0;
-                const totalGananciasBrutas = ventasPeriodo?.reduce((sum, venta) => sum + parseFloat(venta.ganancia), 0) || 0;
-                
                 document.getElementById('ventasBrutasPeriodo').textContent = `$${totalVentas.toFixed(2)}`;
-                document.getElementById('gananciaBrutaPeriodo').textContent = `$${totalGananciasBrutas.toFixed(2)}`;
-
-                // Costos del periodo
+        
+                // 3. Calcular Valor Total de Compra (costo real de productos vendidos)
+                let valorTotalCompra = 0;
+                
+                // Primero obtener todos los productos para evitar consultas individuales
+                const productosMap = {};
+                productos?.forEach(p => productosMap[p.id] = p.costo);
+                
+                for (const venta of ventasPeriodo || []) {
+                    const costoUnitario = productosMap[venta.producto_id] || 0;
+                    valorTotalCompra += costoUnitario * venta.cantidad;
+                }
+        
+                // Mostrar el valor total de compra (costo de productos vendidos)
+                document.getElementById('valorTotalDeCompra').textContent = `$${valorTotalCompra.toFixed(2)}`;
+        
+                // 4. Calcular Ganancia Bruta CORRECTA: Ventas Brutas - Costo de Productos Vendidos
+                const gananciaBruta = totalVentas - valorTotalCompra;
+                document.getElementById('gananciaBrutaPeriodo').textContent = `$${gananciaBruta.toFixed(2)}`;
+        
+                // 5. Costos operativos (gastos adicionales)
                 const { data: costosPeriodo } = await supabase
                     .from('costos')
                     .select('monto')
@@ -1148,11 +1188,11 @@
                 
                 const totalCostos = costosPeriodo?.reduce((sum, costo) => sum + parseFloat(costo.monto), 0) || 0;
                 document.getElementById('costosPeriodo').textContent = `$${totalCostos.toFixed(2)}`;
-
-                // Calcular ganancia neta
-                const gananciaNeta = totalGananciasBrutas - totalCostos;
+        
+                // 6. Calcular Ganancia Neta: Ganancia Bruta - Costos Operativos
+                const gananciaNeta = gananciaBruta - totalCostos;
                 const gananciaNetaElement = document.getElementById('gananciaNetaPeriodo');
-                gananciaNetaElement.textContent = `$${Math.abs(gananciaNeta).toFixed(2)}`;
+                gananciaNetaElement.textContent = `$${gananciaNeta.toFixed(2)}`;
                 
                 // Cambiar color si es pérdida
                 if (gananciaNeta < 0) {
@@ -1160,14 +1200,14 @@
                 } else {
                     gananciaNetaElement.classList.remove('negative');
                 }
-
-                // Total clientes y deudas
+        
+                // 7. Total clientes y deudas
                 const { data: clientes } = await supabase.from('clientes').select('*');
                 document.getElementById('totalClientes').textContent = clientes?.length || 0;
                 
                 const totalDeudas = clientes?.reduce((sum, cliente) => sum + parseFloat(cliente.deuda), 0) || 0;
                 document.getElementById('totalDeudas').textContent = `$${totalDeudas.toFixed(2)}`;
-
+        
                 // Actualizar gráficos
                 updateCharts();
                 
